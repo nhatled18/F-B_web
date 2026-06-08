@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Sidebar from "./Components/Sidebar";
 import DashboardPages from './Pages/Dashboard';
 import LoginPage from './Pages/LoginPage';
+import StaffAttendance from './Pages/StaffAttendance';
+import POS from './Pages/POS';
 import { authService } from './Services/AuthServices';
 import './App.css';
 
@@ -85,33 +87,48 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {isAuthenticated && <Sidebar user={user} onLogout={handleLogout} />}
+        {isAuthenticated && user?.role?.includes('admin') && <Sidebar user={user} onLogout={handleLogout} />}
         
-        <div className={`app-content ${isAuthenticated ? 'with-sidebar' : ''}`}>
+        <div className={`app-content ${isAuthenticated && user?.role?.includes('admin') ? 'with-sidebar' : ''}`}>
           <Routes>
             <Route 
               path="/login" 
               element={
                 isAuthenticated ? 
-                <Navigate to="/dashboard" replace /> : 
+                <Navigate to={user?.role?.includes('admin') ? "/dashboard" : "/staff/attendance"} replace /> : 
                 <LoginPage onLogin={handleLogin} />
               } 
             />
 
-            {/* Dashboard với nested routes */}
+            {/* Dashboard với nested routes (chỉ dành cho admin) */}
             <Route
               path="/dashboard/*"
               element={
-                isAuthenticated ? 
+                isAuthenticated && user?.role?.includes('admin') ? 
                 <DashboardPages user={user} /> : 
-                <Navigate to="/login" replace />
+                <Navigate to="/staff/attendance" replace />
               }
+            />
+
+            {/* Routes cho nhân viên (staff, cashier) */}
+            <Route 
+              path="/staff/attendance" 
+              element={
+                isAuthenticated ? <StaffAttendance onLogout={handleLogout} /> : <Navigate to="/login" replace />
+              } 
+            />
+            
+            <Route 
+              path="/pos" 
+              element={
+                isAuthenticated ? <POS onLogout={handleLogout} /> : <Navigate to="/login" replace />
+              } 
             />
 
             <Route 
               path="/" 
               element={
-                <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+                <Navigate to={isAuthenticated ? (user?.role?.includes('admin') ? "/dashboard" : "/staff/attendance") : "/login"} replace />
               } 
             />
             

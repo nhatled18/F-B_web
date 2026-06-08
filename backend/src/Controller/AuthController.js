@@ -8,7 +8,7 @@ class AuthController {
   // POST /api/auth/register
   async register(req, res) {
     try {
-      const { username, email, password, fullName } = req.body;
+      const { username, email, password, fullName, role } = req.body;
 
       // Validation cơ bản
       if (!username || !email || !password) {
@@ -65,7 +65,7 @@ class AuthController {
           email: email.toLowerCase(),
           password: hashedPassword,
           fullName: fullName || username, // Sử dụng fullName nếu có
-          role: 'user'
+          role: role || 'staff'
         },
         select: {
           id: true,

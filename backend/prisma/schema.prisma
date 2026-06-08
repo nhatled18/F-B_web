@@ -13,7 +13,7 @@ model User {
   password  String
   fullName  String   @map("full_name")
   email     String?  @unique
-  role      String   @default("user")
+  role      String   @default("staff") // "admin", "cashier", "staff", etc. (comma-separated for multiple)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -23,6 +23,10 @@ model User {
   approvedWastages WastageSlip[] @relation("WastageApprover")
   stocktakes       Stocktake[]
   orders           Order[]       @relation("OrderCreator")
+  cashShifts       CashShift[]
+  attendances      Attendance[]
+  checklists       Checklist[]
+  issueLogs        IssueLog[]
 
   @@map("User")
 }
@@ -226,16 +230,19 @@ model StocktakeItem {
 }
 
 model Order {
-  id          Int      @id @default(autoincrement())
-  orderCode   String   @unique
-  totalAmount Float    @default(0)
-  status      String   @default("completed")
-  createdBy   Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  orderCode     String   @unique
+  source        String   @default("at_store") // at_store, take_away, grab, shopeefood
+  paymentMethod String   @default("cash") // cash, banking
+  totalAmount   Float    @default(0)
+  status        String   @default("completed") // completed, canceled
+  misaSynced    Boolean  @default(false)
+  createdBy     Int?     // Serves as cashier_id
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  creator     User?    @relation("OrderCreator", fields: [createdBy], references: [id])
-  items       OrderItem[]
+  creator       User?    @relation("OrderCreator", fields: [createdBy], references: [id])
+  items         OrderItem[]
 
   @@map("Order")
 }
@@ -247,6 +254,7 @@ model OrderItem {
   quantity    Int
   price       Float    @default(0)
   total       Float    @default(0)
+  options     String   @default("") // JSON string for kitchen notes e.g., [{"option_id": "them_pate", "quantity": 1}]
 
   order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product     Product  @relation(fields: [productId], references: [id])
@@ -254,4 +262,82 @@ model OrderItem {
   @@index([orderId])
   @@index([productId])
   @@map("OrderItem")
+}
+
+// --- Module 1: POS ---
+
+model CashShift {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  startAmount       Float    @default(0)
+  endAmountSystem   Float    @default(0)
+  endAmountReal     Float    @default(0)
+  differenceAmount  Float    @default(0)
+  totalCashSales    Float    @default(0)
+  totalBankingSales Float    @default(0)
+  status            String   @default("open") // open, closed
+  date              DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("CashShift")
+}
+
+// --- Module 3: HR & Operations ---
+
+model Attendance {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  checkInTime   DateTime
+  checkOutTime  DateTime?
+  wifiBssid     String    @default("")
+  date          DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([date])
+  @@map("Attendance")
+}
+
+model Checklist {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  shiftType     String    // morning, afternoon
+  taskName      String
+  isCompleted   Boolean   @default(false)
+  completedAt   DateTime?
+  date          DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([date])
+  @@map("Checklist")
+}
+
+model IssueLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String
+  category    String   // equipment, customer_complaint, hygiene, other
+  severity    String   @default("medium") // low, medium, high, critical
+  imageBase64 String?  // ảnh chụp dưới dạng base64
+  status      String   @default("open")  // open, in_progress, resolved
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("IssueLog")
 }

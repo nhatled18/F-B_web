@@ -8,7 +8,8 @@ import historyRoutes from './historyRoutes.js';
 import dashboardRoutes from './dashboardRoutes.js';
 import inventoryRoutes from './inventoryRoutes.js';
 import recipeRoutes from './recipeRoutes.js';
-import posRoutes from './posRoutes.js';
+import posRoutes from '../modules/pos/routes/posRoutes.js';
+import hrRoutes from '../modules/hr_task/routes/hrRoutes.js';
 import wastageRoutes from './wastageRoutes.js';
 import stocktakeRoutes from './stocktakeRoutes.js';
 import hqRoutes from './hqRoutes.js';
@@ -28,6 +29,7 @@ router.use('/pos', posRoutes);
 router.use('/wastage', wastageRoutes);
 router.use('/stocktake', stocktakeRoutes);
 router.use('/hq', hqRoutes);
+router.use('/hr', hrRoutes);
 
 // Health check (optional)
 // router.get('/health', (req, res) => {

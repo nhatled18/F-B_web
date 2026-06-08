@@ -1,0 +1,257 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  fullName  String   @map("full_name")
+  email     String?  @unique
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions     Transaction[]
+  historyLogs      HistoryLog[]
+  reportedWastages WastageSlip[] @relation("WastageReporter")
+  approvedWastages WastageSlip[] @relation("WastageApprover")
+  stocktakes       Stocktake[]
+  orders           Order[]       @relation("OrderCreator")
+
+  @@map("User")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  productName String
+  sku         String   @unique
+  group       String   @default("")
+  stockType1  String   @default("")
+  stockType2  String   @default("")
+  project     String   @default("")
+  unit        String   @default("")
+  note        String   @default("")
+  cost        Float    @default(0)
+  retailPrice Float    @default(0)
+  imageUrl    String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  inventories        Inventory[]
+  transactions       Transaction[]
+  historyLogs        HistoryLog[]
+  recipe             Recipe?
+  componentInRecipes RecipeItem[]      @relation("ComponentRelation")
+  wastageItems       WastageSlipItem[]
+  stocktakeItems     StocktakeItem[]
+  orderItems         OrderItem[]
+
+  @@index([sku])
+  @@index([group])
+  @@map("Product")
+}
+
+model Inventory {
+  id           Int      @id @default(autoincrement())
+  productId    Int
+  stockType1   String   @default("")
+  stockType2   String   @default("")
+  retailPrice  Float    @default(0)
+  cost         Float    @default(0)
+  initialStock Int      @default(0)
+  displayStock Int      @default(0)
+  stockIn      Int      @default(0)
+  stockOut     Int      @default(0)
+  damaged      Int      @default(0)
+  endingStock  Int      @default(0)
+  note         String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([stockType1])
+  @@map("Inventory")
+}
+
+model Transaction {
+  id              Int      @id @default(autoincrement())
+  productId       Int
+  userId          Int?
+  type            String   // IN | OUT | ADJUST
+  warehouseId     Int      @default(1) // ID kho (default = kho chính)
+  transactionCode String   @default("")
+  summary         String   @default("")
+  createdBy       String   @default("")
+  quantity        Int      // Giá trị + hoặc - (do type quyết định)
+  unitPrice       Float    @default(0)
+  source          String   @default("manual") // import_excel | manual | system
+  reason          String   @default("") // LÝ DO XUẤT, damaged, lost, adjust
+  note            String   @default("")
+  date            DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id])
+
+  @@index([productId])
+  @@index([type])
+  @@index([date])
+  @@index([warehouseId])
+  @@index([source])
+  @@index([transactionCode])
+  @@map("Transaction")
+}
+
+model HistoryLog {
+  id          Int      @id @default(autoincrement())
+  action      String
+  productId   Int?
+  userId      Int?
+  productName String
+  productSku  String
+  details     String   @default("")
+  createdAt   DateTime @default(now())
+
+  product Product? @relation(fields: [productId], references: [id])
+  user    User?    @relation(fields: [userId], references: [id])
+
+  @@index([productId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("HistoryLog")
+}
+
+// --- New Models for BOM, POS, Wastage, Stocktake ---
+
+model Recipe {
+  id          Int      @id @default(autoincrement())
+  productId   Int      @unique
+  status      String   @default("active") // active, inactive
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  items       RecipeItem[]
+
+  @@map("Recipe")
+}
+
+model RecipeItem {
+  id            Int      @id @default(autoincrement())
+  recipeId      Int
+  componentId   Int
+  quantity      Float
+  unit          String   @default("")
+
+  recipe        Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  component     Product  @relation("ComponentRelation", fields: [componentId], references: [id])
+
+  @@index([recipeId])
+  @@index([componentId])
+  @@map("RecipeItem")
+}
+
+model WastageSlip {
+  id          Int      @id @default(autoincrement())
+  slipCode    String   @unique
+  status      String   @default("pending") // pending, approved, rejected
+  reason      String   @default("")
+  reportedBy  Int?
+  approvedBy  Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reporter    User?    @relation("WastageReporter", fields: [reportedBy], references: [id])
+  approver    User?    @relation("WastageApprover", fields: [approvedBy], references: [id])
+  items       WastageSlipItem[]
+
+  @@map("WastageSlip")
+}
+
+model WastageSlipItem {
+  id              Int         @id @default(autoincrement())
+  wastageSlipId   Int
+  productId       Int
+  quantity        Int
+  reason          String      @default("")
+  
+  wastageSlip     WastageSlip @relation(fields: [wastageSlipId], references: [id], onDelete: Cascade)
+  product         Product     @relation(fields: [productId], references: [id])
+
+  @@index([wastageSlipId])
+  @@index([productId])
+  @@map("WastageSlipItem")
+}
+
+model Stocktake {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  date        DateTime @default(now())
+  status      String   @default("pending") // pending, completed
+  note        String   @default("")
+  createdBy   Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator     User?    @relation(fields: [createdBy], references: [id])
+  items       StocktakeItem[]
+
+  @@map("Stocktake")
+}
+
+model StocktakeItem {
+  id             Int        @id @default(autoincrement())
+  stocktakeId    Int
+  productId      Int
+  systemQuantity Int
+  actualQuantity Int?
+  difference     Int?
+  note           String     @default("")
+
+  stocktake      Stocktake  @relation(fields: [stocktakeId], references: [id], onDelete: Cascade)
+  product        Product    @relation(fields: [productId], references: [id])
+
+  @@index([stocktakeId])
+  @@index([productId])
+  @@map("StocktakeItem")
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  orderCode   String   @unique
+  totalAmount Float    @default(0)
+  status      String   @default("completed")
+  createdBy   Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator     User?    @relation("OrderCreator", fields: [createdBy], references: [id])
+  items       OrderItem[]
+
+  @@map("Order")
+}
+
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  productId   Int
+  quantity    Int
+  price       Float    @default(0)
+  total       Float    @default(0)
+
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("OrderItem")
+}

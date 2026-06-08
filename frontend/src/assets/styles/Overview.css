@@ -1,0 +1,386 @@
+/* ===========================
+   F&B INVENTORY - Overview.css
+   Dashboard Overview Page
+   =========================== */
+
+.overview-container {
+  padding: 0;
+}
+
+/* ===== KPI STAT CARDS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #E8EAF0;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #FF6B35, #E94560);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.09);
+  border-color: #CBD5E1;
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-card.alert {
+  border-color: #FED7AA;
+  background: linear-gradient(135deg, #FFFBEB 0%, #FFF7ED 100%);
+}
+
+.stat-card.alert::before {
+  background: linear-gradient(90deg, #F59E0B, #EF4444);
+  opacity: 1;
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.stat-info h3 {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.stat-info p {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0D1117;
+  line-height: 1;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.stat-value { font-size: 1.5rem !important; }
+.stat-value-large { font-size: 1.75rem !important; }
+.stat-value.warning, .stat-value.danger { color: #DC2626 !important; }
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon.blue  { background: #EFF6FF; color: #3B82F6; }
+.stat-icon.green { background: #F0FDF4; color: #10B981; }
+.stat-icon.red   { background: #FEF2F2; color: #EF4444; }
+.stat-icon.yellow { background: #FFFBEB; color: #F59E0B; }
+.stat-icon.purple { background: #FAF5FF; color: #8B5CF6; }
+.stat-icon.orange { background: #FFF7ED; color: #FF6B35; }
+.stat-icon.danger { background: #FEF2F2; color: #EF4444; }
+
+/* Trend chip */
+.stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 6px;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.stat-trend.up {
+  background: #F0FDF4;
+  color: #16A34A;
+}
+
+.stat-trend.down {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+/* ===== CHARTS ===== */
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.chart-container {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #E8EAF0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.25s ease;
+}
+
+.chart-container:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+.chart-container.full-width {
+  grid-column: 1 / -1;
+}
+
+.chart-header {
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid #F1F3F7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chart-header h3 {
+  margin: 0;
+  color: #0D1117;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== BOTTOM INFO CARDS ===== */
+.bottom-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.info-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #E8EAF0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.25s ease;
+}
+
+.info-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+.info-card.alert-card {
+  border-color: #FED7AA;
+  background: linear-gradient(135deg, #FFFBEB 0%, white 100%);
+}
+
+.info-card.tips-card {
+  border-color: #BFDBFE;
+  background: linear-gradient(135deg, #EFF6FF 0%, white 100%);
+}
+
+.card-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid #F1F3F7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-header h3 {
+  margin: 0;
+  color: #0D1117;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== PRODUCT LIST ===== */
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #F7F8FC;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.product-item:hover {
+  background: #FFF8F5;
+  border-color: #FED7AA;
+  transform: translateX(3px);
+}
+
+.product-item.warning-item {
+  background: #FFFBEB;
+  border-left: 3px solid #F59E0B;
+}
+
+.product-rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #FF6B35 0%, #E94560 100%);
+  color: white;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.product-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-name {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0D1117;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-quantity {
+  margin: 2px 0 0 0;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.product-name-badge {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0D1117;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stock-info {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.current-stock {
+  font-size: 0.7rem;
+  color: #64748b;
+  background: rgba(100, 116, 139, 0.1);
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-weight: 500;
+}
+
+.min-stock {
+  font-size: 0.7rem;
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-weight: 600;
+}
+
+/* ===== TIPS LIST ===== */
+.tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tip-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border-left: 3px solid;
+  transition: transform 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.tip-item:hover { transform: translateX(3px); }
+
+.danger-tip  { background: rgba(239, 68, 68, 0.05);   border-color: #EF4444; }
+.warning-tip { background: rgba(245, 158, 11, 0.05);  border-color: #F59E0B; }
+.info-tip    { background: rgba(255, 107, 53, 0.05);  border-color: #FF6B35; }
+.success-tip { background: rgba(16, 185, 129, 0.05);  border-color: #10B981; }
+
+.tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+
+.tip-item p {
+  margin: 0;
+  color: #374151;
+  line-height: 1.45;
+}
+
+.tip-item p strong {
+  color: #0D1117;
+  font-weight: 600;
+}
+
+/* empty */
+.empty-state {
+  margin: 1.5rem 0;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.empty-state.success {
+  color: #10B981;
+  font-weight: 600;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .stat-card { padding: 1rem; }
+  .stat-info p { font-size: 1.5rem; }
+  .charts-row { grid-template-columns: 1fr; }
+  .bottom-section { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
